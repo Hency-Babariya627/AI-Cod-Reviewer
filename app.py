@@ -107,7 +107,32 @@ if result is not None:
     else:
         code_lines = code.splitlines()
         syntax_findings = result.syntax_findings
+        # ---------- Summary dashboard ----------
+        ran_ruff = not result.ruff_skipped and result.ruff_error is None
+        ran_radon = not result.complexity_skipped and result.complexity_error is None
 
+        if syntax_findings:
+            st.error("Overall: the code has a syntax error, so the other checks were skipped.")
+        elif not (ran_ruff and ran_radon):
+            st.warning("Overall: some checks could not run, so this summary is incomplete.")
+        elif (
+            result.error_count + result.warning_count
+            + result.style_count + result.flagged_function_count == 0
+        ):
+            st.success(
+                "Overall: these checks found nothing to report. "
+                "That does not guarantee the code is free of bugs."
+            )
+        else:
+            st.info("Overall: there are items to look at. Details are listed below.")
+
+        c1, c2, c3, c4, c5 = st.columns(5)
+        c1.metric("Likely errors", result.error_count if (syntax_findings or ran_ruff) else "—")
+        c2.metric("Warnings", result.warning_count if ran_ruff else "—")
+        c3.metric("Style items", result.style_count if ran_ruff else "—")
+        c4.metric("Complex functions", result.flagged_function_count if ran_radon else "—")
+        c5.metric("Review time", f"{result.seconds:.2f} s")
+        st.divider()
         st.subheader("Syntax check")
         if not syntax_findings:
             st.success("No syntax errors found. Python can read this code.")
@@ -165,20 +190,16 @@ if result is not None:
                 st.success(
                     f"All {len(result.complexity)} function(s) have low complexity (score 1-5)."
                 )
-            st.dataframe(
-                [
-                    {
-                        "Function": r.name,
-                        "Line": r.line,
-                        "Score": r.complexity,
-                        "Rank": r.rank,
-                        "Worth a look?": "Yes" if r.flagged else "No",
-                    }
-                    for r in result.complexity
-                ],
-                width="stretch",
-                hide_index=True,
-            )
+            table_lines = [
+                "| Function | Line | Score | Rank | Worth a look? |",
+                "|---|---:|---:|---|---|",
+            ]
+            for r in result.complexity:
+                worth = "Yes" if r.flagged else "No"
+                table_lines.append(
+                    f"| `{r.name}` | {r.line} | {r.complexity} | {r.rank} | {worth} |"
+                )
+            st.markdown("\n".join(table_lines))
             for r in flagged:
                 with st.expander(f"🟡 {r.name} · line {r.line} · score {r.complexity}"):
                     st.markdown(f"**What it means:** {r.explanation}")
