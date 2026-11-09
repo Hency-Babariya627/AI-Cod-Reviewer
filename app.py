@@ -1,64 +1,23 @@
 import streamlit as st
-from pipeline import review_code
 
+from pipeline import review_code
+from styles import (
+    APP_NAME,
+    CSS,
+    EMPTY_STATE_HTML,
+    FOOTER_HTML,
+    HERO_HTML,
+    MODULE_CARDS_HTML,
+    SIDEBAR_HTML,
+    section_html,
+)
 
 MAX_FILE_SIZE = 200 * 1024  # 200 KB limit for uploaded files
+MAX_OCCURRENCES_SHOWN = 8   # per Ruff rule, so long lists stay readable
 
-st.set_page_config(page_title="AI Code Reviewer", page_icon="🧠", layout="wide")
+st.set_page_config(page_title=APP_NAME, page_icon="🧠", layout="wide")
+st.markdown(CSS, unsafe_allow_html=True)
 
-st.markdown(
-    """
-    <style>
-    /* Gradient title */
-    h1 {
-        background: linear-gradient(90deg, #8B5CF6, #22D3EE);
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-        font-weight: 800;
-    }
-    /* Section headings get a cyan accent */
-    h2, h3, h2 *, h3 * { color: #22D3EE !important; }
-    
-    /* Code editor looks like code */
-    [data-testid="stTextArea"] textarea {
-        font-family: "Cascadia Code", Consolas, monospace;
-        font-size: 0.95rem;
-        border: 1px solid rgba(139, 92, 246, 0.45);
-        border-radius: 10px;
-    }
-
-    /* Summary numbers as cards */
-    [data-testid="stMetric"] {
-        background: #151B2E;
-        border: 1px solid rgba(34, 211, 238, 0.30);
-        border-radius: 12px;
-        padding: 14px 16px;
-    }
-    [data-testid="stMetricValue"] { color: #22D3EE; }
-
-    /* Finding expanders */
-    [data-testid="stExpander"] {
-        border: 1px solid rgba(139, 92, 246, 0.35);
-        border-radius: 10px;
-    }
-
-    /* Buttons */
-    .stButton button { border-radius: 10px; font-weight: 600; }
-    
-    /* Feature pills under the title */
-    .pill-row { display: flex; gap: 8px; flex-wrap: wrap; margin: 4px 0 18px 0; }
-    .pill {
-        background: #151B2E;
-        border: 1px solid rgba(34, 211, 238, 0.35);
-        color: #9AE6F5;
-        border-radius: 999px;
-        padding: 3px 12px;
-        font-size: 0.8rem;
-    }
-    </style>
-    """,
-    unsafe_allow_html=True,
-)
 
 # ---------- Session state (the app's "memory" between reruns) ----------
 DEFAULTS = {
@@ -90,194 +49,311 @@ def clear_all():
     st.session_state.uploader_key += 1  # forces a fresh, empty uploader
 
 
-# ---------- Page header ----------
-st.title("AI-Powered Code Reviewer")
-st.caption("A learning assistant for beginner Python developers")
+def show_code_line(code_lines, line):
+    if line and 1 <= line <= len(code_lines):
+        st.code(code_lines[line - 1], language="python")
 
 
-st.markdown(
-    '<div class="pill-row">'
-    '<span class="pill">Never runs your code</span>'
-    '<span class="pill">Syntax check</span>'
-    '<span class="pill">Ruff quality review</span>'
-    '<span class="pill">Radon complexity</span>'
-    '</div>',
-    unsafe_allow_html=True,
-)
-
-
-# ---------- File upload ----------
-uploaded = st.file_uploader(
-    "Upload a .py file (optional, max 200 KB)",
-    type=["py"],
-    key=f"uploader_{st.session_state.uploader_key}",
-)
-
-# Only process the file when it is new, so edits in the editor are not overwritten.
-if uploaded is not None and uploaded.file_id != st.session_state.last_file_id:
-    st.session_state.last_file_id = uploaded.file_id
-    st.session_state.upload_error = None
-    st.session_state.review_result = None  # new file -> old results are invalid
-
-    if uploaded.size > MAX_FILE_SIZE:
-        st.session_state.upload_error = (
-            f"'{uploaded.name}' is too large (limit is {MAX_FILE_SIZE // 1024} KB)."
-        )
-    else:
-        try:
-            text = uploaded.getvalue().decode("utf-8-sig")  # handles BOM too
-        except UnicodeDecodeError:
-            st.session_state.upload_error = (
-                f"'{uploaded.name}' is not valid UTF-8 text, so it cannot be read."
-            )
-        else:
-            text = normalize_newlines(text)
-            st.session_state.code_input = text
-            st.session_state.original_content = text
-            st.session_state.uploaded_name = uploaded.name  # name is display-only
-
-if st.session_state.upload_error:
-    st.error(st.session_state.upload_error)
-
-# ---------- Code editor ----------
-code = st.text_area("Python code", key="code_input", height=300)
-
-# ---------- File status ----------
-if st.session_state.uploaded_name:
-    if normalize_newlines(code) == st.session_state.original_content:
-        st.info(f"📄 **{st.session_state.uploaded_name}** — matches the uploaded file.")
-    else:
-        st.warning(
-            f"✏️ **{st.session_state.uploaded_name}** — modified "
-            "(the code below differs from the uploaded file)."
-        )
-
-# ---------- Buttons ----------
-col_review, col_clear, _ = st.columns([1, 1, 6])
-review_clicked = col_review.button("Review Code", type="primary")
-col_clear.button("Clear", on_click=clear_all)
-
-if review_clicked:
-    if not code.strip():
-        st.warning("Please enter or upload some Python code first.")
-        st.session_state.review_result = None
-    else:
-        with st.spinner("Reviewing your code..."):
-            st.session_state.review_result = review_code(code)
-
-# ---------- Results area ----------
-result = st.session_state.review_result
-if result is not None:
-    if result.code != code:
-        st.warning("The code has changed since the last review. Click **Review Code** again.")
-    else:
-        code_lines = code.splitlines()
-        syntax_findings = result.syntax_findings
-        # ---------- Summary dashboard ----------
-        ran_ruff = not result.ruff_skipped and result.ruff_error is None
-        ran_radon = not result.complexity_skipped and result.complexity_error is None
-
-        if syntax_findings:
-            st.error("Overall: the code has a syntax error, so the other checks were skipped.")
-        elif not (ran_ruff and ran_radon):
-            st.warning("Overall: some checks could not run, so this summary is incomplete.")
-        elif (
-            result.error_count + result.warning_count
-            + result.style_count + result.flagged_function_count == 0
-        ):
-            st.success(
-                "Overall: these checks found nothing to report. "
-                "That does not guarantee the code is free of bugs."
-            )
-        else:
-            st.info("Overall: there are items to look at. Details are listed below.")
-
-        c1, c2, c3, c4, c5 = st.columns(5)
-        c1.metric("Likely errors", result.error_count if (syntax_findings or ran_ruff) else "—")
-        c2.metric("Warnings", result.warning_count if ran_ruff else "—")
-        c3.metric("Style items", result.style_count if ran_ruff else "—")
-        c4.metric("Complex functions", result.flagged_function_count if ran_radon else "—")
-        c5.metric("Review time", f"{result.seconds:.2f} s")
-        st.divider()
-        st.subheader("Syntax check")
-        if not syntax_findings:
-            st.success("No syntax errors found. Python can read this code.")
-        else:
-            for f in syntax_findings:
-                where = f"line {f.line}" if f.line else "unknown line"
-                st.error(f"**{f.rule}** at {where}: {f.message}")
-                if f.line and 1 <= f.line <= len(code_lines):
-                    st.code(code_lines[f.line - 1], language="python")
-                st.markdown(f"**What it means:** {f.explanation}")
-                st.markdown(f"**How to fix it:** {f.suggestion}")
-
-        st.subheader("Code quality (Ruff)")
-        if result.ruff_skipped:
+def render_syntax(result, code_lines):
+    if not result.syntax_findings:
+        st.success("No syntax errors found. Python can read this code.")
+        if result.error_count:
             st.info(
-                "Ruff was skipped because the code has a syntax error. "
-                "Fix the syntax error first, then click Review Code again."
+                "Syntax only checks the grammar. The Code quality tab found "
+                f"{result.error_count} likely error(s), for example names that are not defined."
             )
-        elif result.ruff_error:
-            st.error(f"Ruff could not run: {result.ruff_error}")
-        elif not result.ruff_findings:
-            st.success("Ruff found no issues.")
-        else:
-            st.write(
-                f"Found **{len(result.ruff_findings)}** item(s): "
-                f"{result.error_count} likely error(s), {result.warning_count} warning(s), "
-                f"{result.style_count} style recommendation(s)."
-            )
-            icons = {"error": "🔴", "warning": "🟡", "info": "🔵"}
-            labels = {"error": "Likely error", "warning": "Warning", "info": "Style"}
-            for f in result.ruff_findings:
-                title = f"{icons[f.severity]} {f.rule} · line {f.line} · {f.message}"
-                with st.expander(title):
-                    st.caption(labels[f.severity])
-                    if f.line and 1 <= f.line <= len(code_lines):
-                        st.code(code_lines[f.line - 1], language="python")
-                    st.markdown(f"**What it means:** {f.explanation}")
-                    st.markdown(f"**How to fix it:** {f.suggestion}")
+        return
+    for f in result.syntax_findings:
+        where = f"line {f.line}" if f.line else "unknown line"
+        st.error(f"**{f.rule}** at {where}: {f.message}")
+        show_code_line(code_lines, f.line)
+        st.markdown(f"**What it means:** {f.explanation}")
+        st.markdown(f"**How to fix it:** {f.suggestion}")
 
-        st.subheader("Complexity (Radon)")
-        if result.complexity_skipped:
-            st.info("Complexity analysis was skipped because of the syntax error above.")
-        elif result.complexity_error:
-            st.error(f"Radon could not run: {result.complexity_error}")
-        elif not result.complexity:
-            st.info("No functions or methods were found, so there is nothing to score.")
+
+def render_ruff(result, code_lines):
+    if result.ruff_skipped:
+        st.info(
+            "Ruff was skipped because the code has a syntax error. "
+            "Fix the syntax error first, then click Review code again."
+        )
+        return
+    if result.ruff_error:
+        st.error(f"Ruff could not run: {result.ruff_error}")
+        return
+    if not result.ruff_findings:
+        st.success("Ruff found no issues.")
+        return
+
+    st.write(
+        f"Found **{len(result.ruff_findings)}** item(s): "
+        f"{result.error_count} likely error(s), {result.warning_count} warning(s), "
+        f"{result.style_count} style recommendation(s)."
+    )
+    icons = {"error": "🔴", "warning": "🟡", "info": "🔵"}
+    labels = {"error": "Likely error", "warning": "Warning", "info": "Style recommendation"}
+    severity_order = {"error": 0, "warning": 1, "info": 2}
+
+    # Group repeated findings by rule so ten long-line warnings are one entry.
+    groups = {}
+    for f in result.ruff_findings:
+        groups.setdefault(f.rule, []).append(f)
+    ordered = sorted(
+        groups.items(),
+        key=lambda item: (severity_order.get(item[1][0].severity, 3), item[1][0].line or 0),
+    )
+
+    for rule, items in ordered:
+        first = items[0]
+        icon = icons.get(first.severity, "🔵")
+        if len(items) == 1:
+            title = f"{icon} {rule} · line {first.line} · {first.message}"
         else:
-            flagged = [r for r in result.complexity if r.flagged]
-            if flagged:
-                st.warning(
-                    f"{len(flagged)} of {len(result.complexity)} function(s) may be hard "
-                    "to maintain (score 6 or higher)."
+            title = f"{icon} {rule} · {len(items)} occurrences · first at line {first.line}"
+        with st.expander(title):
+            st.caption(labels.get(first.severity, "Finding"))
+            st.markdown(f"**What it means:** {first.explanation}")
+            st.markdown(f"**How to fix it:** {first.suggestion}")
+            st.markdown("**Where:**")
+            for f in items[:MAX_OCCURRENCES_SHOWN]:
+                st.markdown(f"Line {f.line}: {f.message}")
+                show_code_line(code_lines, f.line)
+            hidden = items[MAX_OCCURRENCES_SHOWN:]
+            if hidden:
+                more = ", ".join(str(f.line) for f in hidden)
+                st.caption(f"{len(hidden)} more at lines: {more}")
+
+
+def render_complexity(result):
+    if result.complexity_skipped:
+        st.info("Complexity analysis was skipped because of the syntax error.")
+        return
+    if result.complexity_error:
+        st.error(f"Radon could not run: {result.complexity_error}")
+        return
+    if not result.complexity:
+        st.info("No functions or methods were found, so there is nothing to score.")
+        return
+
+    flagged = [r for r in result.complexity if r.flagged]
+    if flagged:
+        st.warning(
+            f"{len(flagged)} of {len(result.complexity)} function(s) may be hard "
+            "to maintain (score 6 or higher)."
+        )
+    else:
+        st.success(f"All {len(result.complexity)} function(s) have low complexity (score 1-5).")
+
+    table_lines = [
+        "| Function | Line | Score | Rank | Worth a look? |",
+        "|---|---:|---:|---|---|",
+    ]
+    for r in result.complexity:
+        worth = "Yes" if r.flagged else "No"
+        table_lines.append(f"| `{r.name}` | {r.line} | {r.complexity} | {r.rank} | {worth} |")
+    st.markdown("\n".join(table_lines))
+
+    for r in flagged:
+        with st.expander(f"🟡 {r.name} · line {r.line} · score {r.complexity}"):
+            st.markdown(f"**What it means:** {r.explanation}")
+            st.markdown(f"**How to simplify:** {r.suggestion}")
+    st.caption(
+        "Ranks follow Radon's convention (A: 1-5, B: 6-10, C: 11-20, "
+        "D: 21-30, E: 31-40, F: 41+). A high score is a hint to take a "
+        "second look, not proof that the code is bad."
+    )
+
+
+def render_results(result, code):
+    code_lines = code.splitlines()
+    syntax_findings = result.syntax_findings
+
+    # ---------- Summary dashboard ----------
+    ran_ruff = not result.ruff_skipped and result.ruff_error is None
+    ran_radon = not result.complexity_skipped and result.complexity_error is None
+
+    if syntax_findings:
+        st.error("Overall: the code has a syntax error, so the other checks were skipped.")
+    elif not (ran_ruff and ran_radon):
+        st.warning("Overall: some checks could not run, so this summary is incomplete.")
+    elif (
+        result.error_count + result.warning_count
+        + result.style_count + result.flagged_function_count == 0
+    ):
+        st.success(
+            "Overall: these checks found nothing to report. "
+            "That does not guarantee the code is free of bugs."
+        )
+    else:
+        st.info("Overall: there are items to look at. Details are in the tabs below.")
+
+    c1, c2, c3, c4, c5 = st.columns(5)
+    c1.metric("Likely errors", result.error_count if (syntax_findings or ran_ruff) else "—")
+    c2.metric("Warnings", result.warning_count if ran_ruff else "—")
+    c3.metric("Style items", result.style_count if ran_ruff else "—")
+    c4.metric("Complex functions", result.flagged_function_count if ran_radon else "—")
+    c5.metric("Review time", f"{result.seconds:.2f} s")
+
+    # ---------- Detail tabs ----------
+    tab_syntax, tab_ruff, tab_radon = st.tabs(["Syntax", "Code quality (Ruff)", "Complexity (Radon)"])
+    with tab_syntax:
+        render_syntax(result, code_lines)
+    with tab_ruff:
+        render_ruff(result, code_lines)
+    with tab_radon:
+        render_complexity(result)
+
+
+# ---------- Sidebar ----------
+with st.sidebar:
+    st.markdown(SIDEBAR_HTML, unsafe_allow_html=True)
+
+# Both pages are tabs so every widget is drawn on every run and keeps its state.
+tab_review, tab_about = st.tabs(["Code Reviewer", "About the Project"])
+
+with tab_review:
+    st.markdown(HERO_HTML, unsafe_allow_html=True)
+
+    left, right = st.columns([3, 2], gap="large")
+
+    with left:
+        st.markdown(
+            section_html("01", "Code workspace", "Paste your code or upload a Python source file."),
+            unsafe_allow_html=True,
+        )
+        # Containers fix the order on screen. The uploader must still be handled
+        # BEFORE the text area is created, so an upload can fill the editor.
+        editor_slot = st.container()
+        upload_slot = st.container()
+        status_slot = st.container()
+        buttons_slot = st.container()
+
+    with right:
+        st.markdown(
+            section_html("02", "Analysis modules", "What this app checks for you."),
+            unsafe_allow_html=True,
+        )
+        st.markdown(MODULE_CARDS_HTML, unsafe_allow_html=True)
+
+    # ---------- File upload ----------
+    with upload_slot:
+        uploaded = st.file_uploader(
+            "Upload a .py file (optional, max 200 KB)",
+            type=["py"],
+            key=f"uploader_{st.session_state.uploader_key}",
+        )
+
+    # Only process the file when it is new, so edits in the editor are not overwritten.
+    if uploaded is not None and uploaded.file_id != st.session_state.last_file_id:
+        st.session_state.last_file_id = uploaded.file_id
+        st.session_state.upload_error = None
+        st.session_state.review_result = None  # new file -> old results are invalid
+
+        safe_name = uploaded.name.replace("`", "")
+        if uploaded.size > MAX_FILE_SIZE:
+            st.session_state.upload_error = (
+                f"`{safe_name}` is too large (limit is {MAX_FILE_SIZE // 1024} KB)."
+            )
+        else:
+            try:
+                text = uploaded.getvalue().decode("utf-8-sig")  # handles BOM too
+            except UnicodeDecodeError:
+                st.session_state.upload_error = (
+                    f"`{safe_name}` is not valid UTF-8 text, so it cannot be read."
                 )
             else:
-                st.success(
-                    f"All {len(result.complexity)} function(s) have low complexity (score 1-5)."
-                )
-            table_lines = [
-                "| Function | Line | Score | Rank | Worth a look? |",
-                "|---|---:|---:|---|---|",
-            ]
-            for r in result.complexity:
-                worth = "Yes" if r.flagged else "No"
-                table_lines.append(
-                    f"| `{r.name}` | {r.line} | {r.complexity} | {r.rank} | {worth} |"
-                )
-            st.markdown("\n".join(table_lines))
-            for r in flagged:
-                with st.expander(f"🟡 {r.name} · line {r.line} · score {r.complexity}"):
-                    st.markdown(f"**What it means:** {r.explanation}")
-                    st.markdown(f"**How to simplify:** {r.suggestion}")
-            st.caption(
-                "Ranks follow Radon's convention (A: 1-5, B: 6-10, C: 11-20, "
-                "D: 21-30, E: 31-40, F: 41+). A high score is a hint to take a "
-                "second look, not proof that the code is bad."
-            )
+                text = normalize_newlines(text)
+                st.session_state.code_input = text
+                st.session_state.original_content = text
+                st.session_state.uploaded_name = safe_name  # name is display-only
 
-else:
-    st.caption(
-        "Paste or upload Python code above, then click Review Code. "
-        "Your code is analysed as text and is never run."
+    # ---------- Code editor ----------
+    with editor_slot:
+        code = st.text_area(
+            "Python code",
+            key="code_input",
+            height=320,
+            placeholder='def greet(name):\n    print(f"Hello, {name}!")\n\n\ngreet("World")',
+        )
+
+    # ---------- Upload errors and file status ----------
+    with status_slot:
+        if st.session_state.upload_error:
+            st.error(st.session_state.upload_error)
+        if st.session_state.uploaded_name:
+            if normalize_newlines(code) == st.session_state.original_content:
+                st.info(f"📄 **{st.session_state.uploaded_name}** — matches the uploaded file.")
+            else:
+                st.warning(
+                    f"✏️ **{st.session_state.uploaded_name}** — modified "
+                    "(the code above differs from the uploaded file)."
+                )
+
+    # ---------- Buttons ----------
+    with buttons_slot:
+        col_review, col_clear = st.columns(2, gap="small")
+        review_clicked = col_review.button("Review code", type="primary", width="stretch")
+        col_clear.button("Clear", on_click=clear_all, width="stretch")
+        st.caption("Static analysis only. Your code is never executed.")
+
+        if review_clicked:
+            if not code.strip():
+                st.warning("Please enter or upload some Python code first.")
+                st.session_state.review_result = None
+            else:
+                with st.spinner("Reviewing your code..."):
+                    st.session_state.review_result = review_code(code)
+
+    # ---------- Results ----------
+    st.markdown(
+        section_html("03", "Analysis results", "Your latest review appears here."),
+        unsafe_allow_html=True,
     )
+    result = st.session_state.review_result
+    if result is None:
+        st.markdown(EMPTY_STATE_HTML, unsafe_allow_html=True)
+    elif result.code != code:
+        st.warning("The code has changed since the last review. Click **Review code** again.")
+    else:
+        render_results(result, code)
+
+    st.markdown(FOOTER_HTML, unsafe_allow_html=True)
+
+
+with tab_about:
+    st.markdown(
+        section_html(
+            "00",
+            "Code review that helps you learn",
+            "A learning assistant for beginner Python developers.",
+        ),
+        unsafe_allow_html=True,
+    )
+    st.markdown(
+        """
+Most code-review tools tell you *what* is wrong. This project also explains *why it matters*
+and *what to try next*, in plain language.
+
+**Available now**
+
+- Paste Python code or upload a single `.py` file (up to 200 KB).
+- Syntax check with line numbers and plain-language explanations. Submitted code is never run.
+- Code quality review with Ruff (rule groups E, F and W), with likely errors kept apart from style advice.
+- Complexity scores for each function with Radon, flagged at a score of 6 or higher.
+- A summary of the results, tied to the exact code that was reviewed.
+
+**Planned, not yet implemented**
+
+- A short overview of what the submitted code does.
+- Evaluation on a set of labelled code examples.
+- Optional LLM-written explanations. The core app does not need them.
+
+**Limits to keep in mind**
+
+- Static analysis cannot find every bug or security problem.
+- Ruff and Radon run only when the syntax is valid, because Python reports one syntax error at a time.
+- Complexity scores are a hint to take a second look, not a verdict on the code.
+- Python only, one file at a time.
+"""
+    )
+    st.markdown(FOOTER_HTML, unsafe_allow_html=True)
