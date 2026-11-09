@@ -117,6 +117,7 @@ button[kind="primary"], [data-testid="stBaseButton-primary"] {
     background: linear-gradient(90deg, #7C3AED, #6366F1); border: none; color: #fff;
 }
 button[data-baseweb="tab"] { font-weight: 600; }
+[data-testid="stMarkdownContainer"] table { width: 100%; }
 </style>
 """
 

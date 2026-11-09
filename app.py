@@ -1,5 +1,13 @@
 import streamlit as st
 
+from findings import (
+    SEVERITY_LABELS,
+    SOURCE_LABELS,
+    collect_rows,
+    filter_rows,
+    to_csv,
+    to_markdown_table,
+)
 from pipeline import review_code
 from styles import (
     APP_NAME,
@@ -14,6 +22,7 @@ from styles import (
 
 MAX_FILE_SIZE = 200 * 1024  # 200 KB limit for uploaded files
 MAX_OCCURRENCES_SHOWN = 8   # per Ruff rule, so long lists stay readable
+MAX_TABLE_ROWS = 200        # rows shown in the findings table; the CSV has them all
 
 st.set_page_config(page_title=APP_NAME, page_icon="🧠", layout="wide")
 st.markdown(CSS, unsafe_allow_html=True)
@@ -164,6 +173,48 @@ def render_complexity(result):
     )
 
 
+def render_findings_table(result, rows):
+    if not rows:
+        if (result.ruff_skipped or result.ruff_error
+                or result.complexity_skipped or result.complexity_error):
+            st.info(
+                "There are no findings to list, but some checks were skipped or could not run. "
+                "See the other tabs."
+            )
+        else:
+            st.success("Nothing to list. These checks found nothing to report.")
+        return
+
+    col_sev, col_src = st.columns(2)
+    chosen_severity = col_sev.multiselect(
+        "Severity",
+        options=list(SEVERITY_LABELS),
+        default=list(SEVERITY_LABELS),
+        format_func=SEVERITY_LABELS.get,
+        key="severity_filter",
+    )
+    chosen_source = col_src.multiselect(
+        "Source",
+        options=list(SOURCE_LABELS),
+        default=list(SOURCE_LABELS),
+        format_func=SOURCE_LABELS.get,
+        key="source_filter",
+    )
+    shown = filter_rows(rows, chosen_severity, chosen_source)
+    st.caption(f"Showing {len(shown)} of {len(rows)} finding(s).")
+    if shown:
+        st.markdown(to_markdown_table(shown[:MAX_TABLE_ROWS]))
+        if len(shown) > MAX_TABLE_ROWS:
+            st.caption(f"The table shows the first {MAX_TABLE_ROWS}. The CSV has all {len(shown)}.")
+    st.download_button(
+        "Download shown findings (CSV)",
+        data=to_csv(shown).encode("utf-8-sig"),
+        file_name="findings.csv",
+        mime="text/csv",
+        disabled=not shown,
+    )
+
+
 def render_results(result, code):
     code_lines = code.splitlines()
     syntax_findings = result.syntax_findings
@@ -195,7 +246,12 @@ def render_results(result, code):
     c5.metric("Review time", f"{result.seconds:.2f} s")
 
     # ---------- Detail tabs ----------
-    tab_syntax, tab_ruff, tab_radon = st.tabs(["Syntax", "Code quality (Ruff)", "Complexity (Radon)"])
+    rows = collect_rows(result)
+    tab_all, tab_syntax, tab_ruff, tab_radon = st.tabs(
+        [f"All findings ({len(rows)})", "Syntax", "Code quality (Ruff)", "Complexity (Radon)"]
+    )
+    with tab_all:
+        render_findings_table(result, rows)
     with tab_syntax:
         render_syntax(result, code_lines)
     with tab_ruff:
