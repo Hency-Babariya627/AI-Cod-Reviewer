@@ -18,6 +18,7 @@ Working and tested:
 - Code quality review with Ruff (rules E, F, W), with severity and explanations
 - Complexity analysis with Radon, with explanations
 - Results are tied to the exact code reviewed; edited code never shows old results
+- Summary dashboard with counts of errors, warnings, style items, and complex functions
 
 Planned (later sprints): fuller results dashboard, evaluation set and metrics,
 optional LLM explanations. These are **not implemented yet**.

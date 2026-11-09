@@ -1,10 +1,64 @@
 import streamlit as st
 from pipeline import review_code
 
+
 MAX_FILE_SIZE = 200 * 1024  # 200 KB limit for uploaded files
 
 st.set_page_config(page_title="AI Code Reviewer", page_icon="🧠", layout="wide")
 
+st.markdown(
+    """
+    <style>
+    /* Gradient title */
+    h1 {
+        background: linear-gradient(90deg, #8B5CF6, #22D3EE);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        font-weight: 800;
+    }
+    /* Section headings get a cyan accent */
+    h2, h3, h2 *, h3 * { color: #22D3EE !important; }
+    
+    /* Code editor looks like code */
+    [data-testid="stTextArea"] textarea {
+        font-family: "Cascadia Code", Consolas, monospace;
+        font-size: 0.95rem;
+        border: 1px solid rgba(139, 92, 246, 0.45);
+        border-radius: 10px;
+    }
+
+    /* Summary numbers as cards */
+    [data-testid="stMetric"] {
+        background: #151B2E;
+        border: 1px solid rgba(34, 211, 238, 0.30);
+        border-radius: 12px;
+        padding: 14px 16px;
+    }
+    [data-testid="stMetricValue"] { color: #22D3EE; }
+
+    /* Finding expanders */
+    [data-testid="stExpander"] {
+        border: 1px solid rgba(139, 92, 246, 0.35);
+        border-radius: 10px;
+    }
+
+    /* Buttons */
+    .stButton button { border-radius: 10px; font-weight: 600; }
+    
+    /* Feature pills under the title */
+    .pill-row { display: flex; gap: 8px; flex-wrap: wrap; margin: 4px 0 18px 0; }
+    .pill {
+        background: #151B2E;
+        border: 1px solid rgba(34, 211, 238, 0.35);
+        color: #9AE6F5;
+        border-radius: 999px;
+        padding: 3px 12px;
+        font-size: 0.8rem;
+    }
+    </style>
+    """,
+    unsafe_allow_html=True,
+)
 
 # ---------- Session state (the app's "memory" between reruns) ----------
 DEFAULTS = {
@@ -40,9 +94,21 @@ def clear_all():
 st.title("AI-Powered Code Reviewer")
 st.caption("A learning assistant for beginner Python developers")
 
+
+st.markdown(
+    '<div class="pill-row">'
+    '<span class="pill">Never runs your code</span>'
+    '<span class="pill">Syntax check</span>'
+    '<span class="pill">Ruff quality review</span>'
+    '<span class="pill">Radon complexity</span>'
+    '</div>',
+    unsafe_allow_html=True,
+)
+
+
 # ---------- File upload ----------
 uploaded = st.file_uploader(
-    "Upload a .py file (optional)",
+    "Upload a .py file (optional, max 200 KB)",
     type=["py"],
     key=f"uploader_{st.session_state.uploader_key}",
 )
@@ -209,3 +275,9 @@ if result is not None:
                 "D: 21-30, E: 31-40, F: 41+). A high score is a hint to take a "
                 "second look, not proof that the code is bad."
             )
+
+else:
+    st.caption(
+        "Paste or upload Python code above, then click Review Code. "
+        "Your code is analysed as text and is never run."
+    )
