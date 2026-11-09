@@ -82,3 +82,7 @@ docs/DESIGN.md          Architecture and design decisions
 - Complexity ranks follow Radon's convention and are a guide, not a verdict.
 - Explanations are rule-based templates. Rules without a template get a
   generic explanation with a pointer to the Ruff documentation.
+
+
+## Screenshot
+![AI Code Reviewer showing a review with findings](docs/screenshot.png)
