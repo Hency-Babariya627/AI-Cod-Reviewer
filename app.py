@@ -8,6 +8,7 @@ from findings import (
     to_csv,
     to_markdown_table,
 )
+from overview import escape_markdown
 from pipeline import review_code
 from styles import (
     APP_NAME,
@@ -23,6 +24,7 @@ from styles import (
 MAX_FILE_SIZE = 200 * 1024  # 200 KB limit for uploaded files
 MAX_OCCURRENCES_SHOWN = 8   # per Ruff rule, so long lists stay readable
 MAX_TABLE_ROWS = 200        # rows shown in the findings table; the CSV has them all
+MAX_OVERVIEW_ITEMS = 40     # imports, functions and classes listed in the overview
 
 st.set_page_config(page_title=APP_NAME, page_icon="🧠", layout="wide")
 st.markdown(CSS, unsafe_allow_html=True)
@@ -173,6 +175,82 @@ def render_complexity(result):
     )
 
 
+def render_overview(result):
+    if result.syntax_findings:
+        st.info(
+            "The overview was skipped because the code has a syntax error. "
+            "Fix it first, then click Review code again."
+        )
+        return
+    if result.overview_error:
+        st.error(f"The overview could not be built: {result.overview_error}")
+        return
+    o = result.overview
+    if o is None:
+        st.info("No overview is available for this review.")
+        return
+
+    st.write(
+        f"This file has **{o.code_line_count}** lines of code, with "
+        f"**{len(o.functions)}** function(s), **{len(o.classes)}** class(es) "
+        f"and **{len(o.imports)}** import(s)."
+    )
+    if o.module_doc:
+        st.caption(f"The file describes itself as: {escape_markdown(o.module_doc)}")
+    for note in o.notes:
+        st.info(note)
+
+    if o.imports:
+        st.markdown("**Imports** (code this file borrows)")
+        lines = []
+        for imp in o.imports[:MAX_OVERVIEW_ITEMS]:
+            purpose = f" for {imp.purpose}" if imp.purpose else ""
+            lines.append(f"- `{imp.text}`: {imp.kind}{purpose}")
+        st.markdown("\n".join(lines))
+
+    if o.functions:
+        st.markdown("**Functions** (named blocks of code you can reuse)")
+        lines = []
+        for f in o.functions[:MAX_OVERVIEW_ITEMS]:
+            prefix = "async " if f.is_async else ""
+            decorated = "".join(f", decorated with `@{d}`" for d in f.decorators)
+            line = f"- `{prefix}{f.signature}` (line {f.line}{decorated}): {escape_markdown(f.summary())}"
+            if f.doc:
+                line += f" Its docstring says: {escape_markdown(f.doc)}"
+            lines.append(line)
+        st.markdown("\n".join(lines))
+        if len(o.functions) > MAX_OVERVIEW_ITEMS:
+            st.caption(f"Showing the first {MAX_OVERVIEW_ITEMS} of {len(o.functions)} functions.")
+
+    if o.classes:
+        st.markdown("**Classes** (blueprints for objects)")
+        lines = []
+        for c in o.classes[:MAX_OVERVIEW_ITEMS]:
+            bases = f", based on {', '.join(f'`{b}`' for b in c.bases)}" if c.bases else ""
+            methods = ", ".join(f"`{m}`" for m in c.methods) if c.methods else "none"
+            line = f"- `{c.name}` (line {c.line}{bases}): methods: {methods}."
+            if c.doc:
+                line += f" Its docstring says: {escape_markdown(c.doc)}"
+            lines.append(line)
+        st.markdown("\n".join(lines))
+
+    if o.has_main_guard or o.top_level_calls:
+        st.markdown("**When the file runs**")
+        if o.has_main_guard:
+            st.markdown(
+                "The block starting with `if __name__ == \"__main__\":` runs only when you run "
+                "this file directly, not when another file imports it."
+            )
+        if o.top_level_calls:
+            calls = ", ".join(f"`{c}`" for c in o.top_level_calls)
+            st.markdown(f"It calls: {calls}.")
+
+    st.caption(
+        "This overview comes from reading the structure of your code. It does not run the "
+        "code, and it cannot tell you whether the code works correctly."
+    )
+
+
 def render_findings_table(result, rows):
     if not rows:
         if (result.ruff_skipped or result.ruff_error
@@ -247,9 +325,17 @@ def render_results(result, code):
 
     # ---------- Detail tabs ----------
     rows = collect_rows(result)
-    tab_all, tab_syntax, tab_ruff, tab_radon = st.tabs(
-        [f"All findings ({len(rows)})", "Syntax", "Code quality (Ruff)", "Complexity (Radon)"]
+    tab_what, tab_all, tab_syntax, tab_ruff, tab_radon = st.tabs(
+        [
+            "What this code does",
+            f"All findings ({len(rows)})",
+            "Syntax",
+            "Code quality (Ruff)",
+            "Complexity (Radon)",
+        ]
     )
+    with tab_what:
+        render_overview(result)
     with tab_all:
         render_findings_table(result, rows)
     with tab_syntax:
@@ -396,11 +482,12 @@ and *what to try next*, in plain language.
 - Syntax check with line numbers and plain-language explanations. Submitted code is never run.
 - Code quality review with Ruff (rule groups E, F and W), with likely errors kept apart from style advice.
 - Complexity scores for each function with Radon, flagged at a score of 6 or higher.
+- A plain-language overview of what the code is made of: imports, functions, classes and what runs.
+- A findings table with severity and source filters and a CSV download.
 - A summary of the results, tied to the exact code that was reviewed.
 
 **Planned, not yet implemented**
 
-- A short overview of what the submitted code does.
 - Evaluation on a set of labelled code examples.
 - Optional LLM-written explanations. The core app does not need them.
 

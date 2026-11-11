@@ -139,8 +139,8 @@ SIDEBAR_HTML = f"""
 <div class="cap"><span class="dot-on"></span>Syntax validation</div>
 <div class="cap"><span class="dot-on"></span>Ruff quality review</div>
 <div class="cap"><span class="dot-on"></span>Radon complexity</div>
+<div class="cap"><span class="dot-on"></span>Code overview</div>
 <div class="side-label" style="margin-top:22px;">PLANNED</div>
-<div class="cap cap-planned"><span class="dot-off"></span>Code overview</div>
 <div class="cap cap-planned"><span class="dot-off"></span>Evaluation on labelled examples</div>
 """
 

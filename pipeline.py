@@ -5,6 +5,7 @@ from analyzers.radon_check import ComplexityResult, analyze_complexity
 from analyzers.ruff_check import run_ruff
 from analyzers.syntax_check import check_syntax
 from models import Finding
+from overview import Overview, describe_code
 
 
 @dataclass
@@ -20,6 +21,8 @@ class ReviewResult:
     complexity_error: str | None
     complexity_skipped: bool
     seconds: float
+    overview: Overview | None = None
+    overview_error: str | None = None
 
     @property
     def error_count(self) -> int:
@@ -49,7 +52,9 @@ def review_code(code: str) -> ReviewResult:
 
     ruff_findings, ruff_error = [], None
     complexity, complexity_error = [], None
+    overview, overview_error = None, None
     if not skip:
+        overview, overview_error = describe_code(code)
         ruff_findings, ruff_error = run_ruff(code)
         complexity, complexity_error = analyze_complexity(code)
 
@@ -63,4 +68,6 @@ def review_code(code: str) -> ReviewResult:
         complexity_error=complexity_error,
         complexity_skipped=skip,
         seconds=time.perf_counter() - start,
+        overview=overview,
+        overview_error=overview_error,
     )
