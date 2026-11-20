@@ -40,7 +40,7 @@ Not done yet:
 ## Requirements
 
 - Developed and tested on Windows 11 with Python 3.13.9 and Streamlit 1.66.1
-- Python 3.10 or newer is required
+- Python 3.12 or newer is required
 
 ## Setup (Windows PowerShell)
 

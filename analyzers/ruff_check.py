@@ -43,7 +43,7 @@ _EXPLANATIONS = {
         "Move the import to the top of the file.",
     ),
     "E501": (
-        "This line is very long, which makes code harder to read.",
+        "This line is longer than 88 characters (Ruff's default limit), which makes code harder to read.",
         "Split it over several lines or shorten it. This is a style recommendation, not a bug.",
     ),
     "E701": (
@@ -83,8 +83,8 @@ _EXPLANATIONS = {
         "Delete the trailing spaces. Most editors can do this automatically.",
     ),
     "W292": (
-        "The file does not end with a blank line.",
-        "Press Enter once at the end of the file.",
+        "The last line of the file does not end with a newline character.",
+        "Press Enter once at the end of the file, so the last line ends properly.",
     ),
     "W293": (
         "A blank line contains spaces or tabs.",
@@ -93,6 +93,34 @@ _EXPLANATIONS = {
     "W605": (
         "A backslash in a normal string is not a valid escape sequence (such as \\d).",
         "Put an 'r' before the string, like r'\\d', or double the backslash.",
+    ),
+    "E713": (
+        "A membership test is written as 'not x in y'. It works, but it is easy to misread.",
+        "Write 'x not in y' instead.",
+    ),
+    "E714": (
+        "An identity test is written as 'not x is y'. It works, but it is easy to misread.",
+        "Write 'x is not y' instead.",
+    ),
+    "E721": (
+        "Two types are compared with '==', for example 'type(a) == type(b)'. This can give wrong answers for related types.",
+        "Use 'isinstance(value, SomeType)' to check a type.",
+    ),
+    "F632": (
+        "'is' or 'is not' is used to compare with a text or number. 'is' asks whether both sides are the very same object, not whether the values are equal, so the result can be wrong.",
+        "Use '==' or '!=' to compare values. Keep 'is' for None.",
+    ),
+    "W191": (
+        "This line is indented with a tab instead of spaces.",
+        "Use 4 spaces for each level of indentation. Most editors can convert tabs to spaces.",
+    ),
+    "F403": (
+        "'from module import *' brings in every name from a module, so it is unclear where a name comes from.",
+        "Import only what you need, for example 'from math import sqrt', or use 'import math'.",
+    ),
+    "F405": (
+        "This name may come from a 'from module import *' line, so Ruff cannot check that it exists.",
+        "Import the name explicitly instead of using '*'.",
     ),
 }
 
