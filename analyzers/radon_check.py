@@ -1,3 +1,4 @@
+import warnings
 from dataclasses import dataclass
 
 from radon.complexity import cc_rank, cc_visit
@@ -57,7 +58,9 @@ def analyze_complexity(code: str) -> tuple[list[ComplexityResult], str | None]:
     if there are no functions. Results are sorted with the most complex first.
     """
     try:
-        blocks = cc_visit(code)
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore")  # Ruff reports invalid escapes (W605)
+            blocks = cc_visit(code)
     except SyntaxError as err:
         return [], f"The code could not be parsed for complexity analysis: {err.msg}"
     except Exception as err:  # keep the app alive if Radon fails unexpectedly
