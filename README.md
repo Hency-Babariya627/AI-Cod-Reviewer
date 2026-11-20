@@ -15,7 +15,7 @@ An optional LLM layer for explanations is planned and is not required for anythi
 
 ![AI Code Reviewer showing a review with findings](docs/screenshot.png)
 
-## Current status (updated 9 November 2026)
+## Current status (updated 12 November 2026)
 
 Working and covered by automated tests (74 tests pass):
 

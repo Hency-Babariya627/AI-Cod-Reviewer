@@ -1,0 +1,324 @@
+{
+  "label_method": "Every snippet was designed to contain a known set of findings, and the expected findings were fixed at design time from the design, not copied from tool output. Ruff, compile() and a complexity counter were run afterwards only to catch design mistakes. Stable E, F, W rules only.",
+  "cases": [
+    {
+      "file": "clean_temperature_converter.py",
+      "labelled": true,
+      "expected": [],
+      "flagged_functions": [],
+      "syntax_error": false
+    },
+    {
+      "file": "clean_function_docstring.py",
+      "labelled": true,
+      "expected": [],
+      "flagged_functions": [],
+      "syntax_error": false
+    },
+    {
+      "file": "clean_class_bank_account.py",
+      "labelled": true,
+      "expected": [],
+      "flagged_functions": [],
+      "syntax_error": false
+    },
+    {
+      "file": "clean_imports_used.py",
+      "labelled": true,
+      "expected": [],
+      "flagged_functions": [],
+      "syntax_error": false
+    },
+    {
+      "file": "clean_list_comprehension.py",
+      "labelled": true,
+      "expected": [],
+      "flagged_functions": [],
+      "syntax_error": false
+    },
+    {
+      "file": "clean_while_loop_menu.py",
+      "labelled": true,
+      "expected": [],
+      "flagged_functions": [],
+      "syntax_error": false
+    },
+    {
+      "file": "f401_unused_import.py",
+      "labelled": true,
+      "expected": [
+        {
+          "rule": "F401",
+          "line": 1
+        }
+      ],
+      "flagged_functions": [],
+      "syntax_error": false
+    },
+    {
+      "file": "f821_undefined_name.py",
+      "labelled": true,
+      "expected": [
+        {
+          "rule": "F821",
+          "line": 4
+        }
+      ],
+      "flagged_functions": [],
+      "syntax_error": false
+    },
+    {
+      "file": "f841_unused_variable.py",
+      "labelled": true,
+      "expected": [
+        {
+          "rule": "F841",
+          "line": 2
+        }
+      ],
+      "flagged_functions": [],
+      "syntax_error": false
+    },
+    {
+      "file": "e501_long_line.py",
+      "labelled": true,
+      "expected": [
+        {
+          "rule": "E501",
+          "line": 2
+        }
+      ],
+      "flagged_functions": [],
+      "syntax_error": false
+    },
+    {
+      "file": "w291_trailing_space.py",
+      "labelled": true,
+      "expected": [
+        {
+          "rule": "W291",
+          "line": 2
+        }
+      ],
+      "flagged_functions": [],
+      "syntax_error": false
+    },
+    {
+      "file": "w292_no_final_newline.py",
+      "labelled": true,
+      "expected": [
+        {
+          "rule": "W292",
+          "line": 3
+        }
+      ],
+      "flagged_functions": [],
+      "syntax_error": false
+    },
+    {
+      "file": "w293_blank_line_whitespace.py",
+      "labelled": true,
+      "expected": [
+        {
+          "rule": "W293",
+          "line": 2
+        }
+      ],
+      "flagged_functions": [],
+      "syntax_error": false
+    },
+    {
+      "file": "e701_one_line_if.py",
+      "labelled": true,
+      "expected": [
+        {
+          "rule": "E701",
+          "line": 2
+        }
+      ],
+      "flagged_functions": [],
+      "syntax_error": false
+    },
+    {
+      "file": "e711_compare_none.py",
+      "labelled": true,
+      "expected": [
+        {
+          "rule": "E711",
+          "line": 2
+        }
+      ],
+      "flagged_functions": [],
+      "syntax_error": false
+    },
+    {
+      "file": "e712_compare_true.py",
+      "labelled": true,
+      "expected": [
+        {
+          "rule": "E712",
+          "line": 2
+        }
+      ],
+      "flagged_functions": [],
+      "syntax_error": false
+    },
+    {
+      "file": "e722_bare_except.py",
+      "labelled": true,
+      "expected": [
+        {
+          "rule": "E722",
+          "line": 4
+        }
+      ],
+      "flagged_functions": [],
+      "syntax_error": false
+    },
+    {
+      "file": "e741_ambiguous_name.py",
+      "labelled": true,
+      "expected": [
+        {
+          "rule": "E741",
+          "line": 1
+        }
+      ],
+      "flagged_functions": [],
+      "syntax_error": false
+    },
+    {
+      "file": "multi_three_issues.py",
+      "labelled": true,
+      "expected": [
+        {
+          "rule": "F401",
+          "line": 1
+        },
+        {
+          "rule": "F841",
+          "line": 8
+        },
+        {
+          "rule": "E711",
+          "line": 10
+        }
+      ],
+      "flagged_functions": [],
+      "syntax_error": false
+    },
+    {
+      "file": "multi_repeated_f401.py",
+      "labelled": true,
+      "expected": [
+        {
+          "rule": "F401",
+          "line": 1
+        },
+        {
+          "rule": "F401",
+          "line": 2
+        },
+        {
+          "rule": "F401",
+          "line": 3
+        }
+      ],
+      "flagged_functions": [],
+      "syntax_error": false
+    },
+    {
+      "file": "multi_realistic_beginner.py",
+      "labelled": true,
+      "expected": [
+        {
+          "rule": "F401",
+          "line": 1
+        },
+        {
+          "rule": "E741",
+          "line": 6
+        },
+        {
+          "rule": "W291",
+          "line": 6
+        },
+        {
+          "rule": "E722",
+          "line": 10
+        }
+      ],
+      "flagged_functions": [],
+      "syntax_error": false
+    },
+    {
+      "file": "cc1_simple_function.py",
+      "labelled": true,
+      "expected": [],
+      "flagged_functions": [],
+      "syntax_error": false
+    },
+    {
+      "file": "cc5_not_flagged.py",
+      "labelled": true,
+      "expected": [],
+      "flagged_functions": [],
+      "syntax_error": false
+    },
+    {
+      "file": "cc6_flagged.py",
+      "labelled": true,
+      "expected": [],
+      "flagged_functions": [
+        "day_name"
+      ],
+      "syntax_error": false
+    },
+    {
+      "file": "cc11_flagged.py",
+      "labelled": true,
+      "expected": [],
+      "flagged_functions": [
+        "check_password"
+      ],
+      "syntax_error": false
+    },
+    {
+      "file": "cc_two_functions.py",
+      "labelled": true,
+      "expected": [],
+      "flagged_functions": [
+        "count_valid"
+      ],
+      "syntax_error": false
+    },
+    {
+      "file": "syntax_missing_colon.py",
+      "labelled": true,
+      "expected": [],
+      "flagged_functions": [],
+      "syntax_error": true
+    },
+    {
+      "file": "syntax_unclosed_parenthesis.py",
+      "labelled": true,
+      "expected": [],
+      "flagged_functions": [],
+      "syntax_error": true
+    },
+    {
+      "file": "syntax_bad_indentation.py",
+      "labelled": true,
+      "expected": [],
+      "flagged_functions": [],
+      "syntax_error": true
+    },
+    {
+      "file": "syntax_return_outside_function.py",
+      "labelled": true,
+      "expected": [],
+      "flagged_functions": [],
+      "syntax_error": true
+    }
+  ]
+}

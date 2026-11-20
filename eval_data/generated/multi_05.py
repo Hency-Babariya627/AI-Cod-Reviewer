@@ -1,0 +1,27 @@
+def percent(part, whole):
+    letter = None
+    if letter == None:
+        print("nothing yet")
+    print(f"Done")
+    return round(part / whole * 100, 1)
+
+
+class Tally:
+    def __init__(self):
+        self.counts = {}
+
+    def add(self, key):
+        self.counts[key] = self.counts.get(key, 0) + 1
+
+    def total(self):
+        return sum(self.counts.values())
+
+
+tally = Tally()
+tally.add("a")
+tally.add("a")
+word = 3
+if word > 1:
+	print("big")
+tally.add("b")
+print("a share:", percent(tally.counts["a"], tally.total()), "%")

@@ -1,0 +1,205 @@
+{
+  "label_method": "Labelled by reading each file. Line lengths, whitespace and end-of-file were checked with a small text script that does not use Ruff; complexity was counted by hand following Radon's documented rules. Ruff was run afterwards only as a cross-check; where it differed, see notes. Stable E, F, W rules only.",
+  "cases": [
+    {
+      "file": "real_algo_euler_002.py",
+      "labelled": true,
+      "expected": [],
+      "flagged_functions": [],
+      "syntax_error": false
+    },
+    {
+      "file": "real_algo_exchange_sort.py",
+      "labelled": true,
+      "expected": [],
+      "flagged_functions": [],
+      "syntax_error": false,
+      "notes": "Uses Python 3.12+ generic syntax (def f[T: ...]); valid on 3.13."
+    },
+    {
+      "file": "real_algo_kaprekar.py",
+      "labelled": true,
+      "expected": [],
+      "flagged_functions": [
+        "is_kaprekar"
+      ],
+      "syntax_error": false,
+      "notes": "Complexity 7: 4 if + 1 for + 1 and."
+    },
+    {
+      "file": "real_algo_monte_carlo_dice.py",
+      "labelled": true,
+      "expected": [],
+      "flagged_functions": [],
+      "syntax_error": false,
+      "notes": "throw_dice complexity 5 (comprehensions counted), below the threshold."
+    },
+    {
+      "file": "real_algo_nand_gate.py",
+      "labelled": true,
+      "expected": [],
+      "flagged_functions": [],
+      "syntax_error": false
+    },
+    {
+      "file": "real_algo_reverse_words.py",
+      "labelled": true,
+      "expected": [],
+      "flagged_functions": [],
+      "syntax_error": false
+    },
+    {
+      "file": "real_geek_array_equilibrium.py",
+      "labelled": true,
+      "expected": [
+        {
+          "rule": "E501",
+          "line": 3
+        },
+        {
+          "rule": "E501",
+          "line": 5
+        }
+      ],
+      "flagged_functions": [],
+      "syntax_error": false,
+      "notes": "Two long docstring lines."
+    },
+    {
+      "file": "real_geek_count_vowels.py",
+      "labelled": true,
+      "expected": [],
+      "flagged_functions": [],
+      "syntax_error": false
+    },
+    {
+      "file": "real_geek_counting_sort.py",
+      "labelled": true,
+      "expected": [
+        {
+          "rule": "E501",
+          "line": 17
+        },
+        {
+          "rule": "E501",
+          "line": 29
+        }
+      ],
+      "flagged_functions": [],
+      "syntax_error": false,
+      "notes": "counting_sort complexity 4."
+    },
+    {
+      "file": "real_geek_crc.py",
+      "labelled": true,
+      "expected": [
+        {
+          "rule": "E741",
+          "line": 2
+        },
+        {
+          "rule": "F841",
+          "line": 3
+        }
+      ],
+      "flagged_functions": [
+        "crc_check"
+      ],
+      "syntax_error": false,
+      "notes": "Variable named l (line 2); ct assigned and never used (line 3). Complexity 6+ even without counting comprehensions."
+    },
+    {
+      "file": "real_geek_letter_counter.py",
+      "labelled": true,
+      "expected": [
+        {
+          "rule": "F841",
+          "line": 19
+        },
+        {
+          "rule": "E501",
+          "line": 43
+        }
+      ],
+      "flagged_functions": [],
+      "syntax_error": false,
+      "notes": "labl assigned and never used inside printt (line 19)."
+    },
+    {
+      "file": "real_geek_number_guessing.py",
+      "labelled": true,
+      "expected": [],
+      "flagged_functions": [
+        "start_game"
+      ],
+      "syntax_error": false,
+      "notes": "start_game has many branches (complexity 9 or more)."
+    },
+    {
+      "file": "real_geek_recursive_strings.py",
+      "labelled": true,
+      "expected": [],
+      "flagged_functions": [],
+      "syntax_error": false,
+      "notes": "CheckTwoStrings complexity 5: just below the threshold."
+    },
+    {
+      "file": "real_geek_remove_punctuation.py",
+      "labelled": true,
+      "expected": [],
+      "flagged_functions": [],
+      "syntax_error": false
+    },
+    {
+      "file": "real_geek_search_bst.py",
+      "labelled": true,
+      "expected": [
+        {
+          "rule": "E501",
+          "line": 6
+        },
+        {
+          "rule": "E501",
+          "line": 16
+        }
+      ],
+      "flagged_functions": [],
+      "syntax_error": false,
+      "notes": "Imports tree_node, which is not in this folder; static analysis does not resolve it."
+    },
+    {
+      "file": "real_geek_snake_wall.py",
+      "labelled": true,
+      "expected": [
+        {
+          "rule": "E501",
+          "line": 7
+        },
+        {
+          "rule": "E501",
+          "line": 13
+        }
+      ],
+      "flagged_functions": [],
+      "syntax_error": false,
+      "notes": "File ends with an extra blank line (line 46). That is W391, which I believe is a preview rule, so it is not in expected. Also one blank line before class Wall (E302, also believed preview). To review if the tool reports either."
+    },
+    {
+      "file": "real_geek_whatsapp_monitor.py",
+      "labelled": true,
+      "expected": [
+        {
+          "rule": "E722",
+          "line": 47
+        },
+        {
+          "rule": "E722",
+          "line": 52
+        }
+      ],
+      "flagged_functions": [],
+      "syntax_error": false,
+      "notes": "Two bare except clauses. Lines 29 and 36 are long but consist of a single unbroken string, which E501 ignores."
+    }
+  ]
+}

@@ -1,0 +1,172 @@
+[
+  {
+    "file": "real_geek_array_equilibrium.py",
+    "source_repo": "https://github.com/geekcomputers/Python",
+    "original_path": "Python-Array-Equilibrium-Index.py",
+    "commit": "6dbf3a711d6d83912866ac6bb59eb8670969f302",
+    "source_url": "https://github.com/geekcomputers/Python/blob/6dbf3a711d6d83912866ac6bb59eb8670969f302/Python-Array-Equilibrium-Index.py",
+    "licence": "MIT",
+    "copyright": "Copyright (c) 2018 Craig Richards",
+    "lines": 39
+  },
+  {
+    "file": "real_geek_count_vowels.py",
+    "source_repo": "https://github.com/geekcomputers/Python",
+    "original_path": "count the numbers of two vovels.py",
+    "commit": "6dbf3a711d6d83912866ac6bb59eb8670969f302",
+    "source_url": "https://github.com/geekcomputers/Python/blob/6dbf3a711d6d83912866ac6bb59eb8670969f302/count%20the%20numbers%20of%20two%20vovels.py",
+    "licence": "MIT",
+    "copyright": "Copyright (c) 2018 Craig Richards",
+    "lines": 19
+  },
+  {
+    "file": "real_geek_whatsapp_monitor.py",
+    "source_repo": "https://github.com/geekcomputers/Python",
+    "original_path": "whatsapp-monitor.py",
+    "commit": "6dbf3a711d6d83912866ac6bb59eb8670969f302",
+    "source_url": "https://github.com/geekcomputers/Python/blob/6dbf3a711d6d83912866ac6bb59eb8670969f302/whatsapp-monitor.py",
+    "licence": "MIT",
+    "copyright": "Copyright (c) 2018 Craig Richards",
+    "lines": 53
+  },
+  {
+    "file": "real_geek_remove_punctuation.py",
+    "source_repo": "https://github.com/geekcomputers/Python",
+    "original_path": "Python Programs/Python Program to Remove Punctuations from a String.py",
+    "commit": "6dbf3a711d6d83912866ac6bb59eb8670969f302",
+    "source_url": "https://github.com/geekcomputers/Python/blob/6dbf3a711d6d83912866ac6bb59eb8670969f302/Python%20Programs/Python%20Program%20to%20Remove%20Punctuations%20from%20a%20String.py",
+    "licence": "MIT",
+    "copyright": "Copyright (c) 2018 Craig Richards",
+    "lines": 16
+  },
+  {
+    "file": "real_geek_letter_counter.py",
+    "source_repo": "https://github.com/geekcomputers/Python",
+    "original_path": "Letter_Counter.py",
+    "commit": "6dbf3a711d6d83912866ac6bb59eb8670969f302",
+    "source_url": "https://github.com/geekcomputers/Python/blob/6dbf3a711d6d83912866ac6bb59eb8670969f302/Letter_Counter.py",
+    "licence": "MIT",
+    "copyright": "Copyright (c) 2018 Craig Richards",
+    "lines": 47
+  },
+  {
+    "file": "real_geek_crc.py",
+    "source_repo": "https://github.com/geekcomputers/Python",
+    "original_path": "CRC/crc.py",
+    "commit": "6dbf3a711d6d83912866ac6bb59eb8670969f302",
+    "source_url": "https://github.com/geekcomputers/Python/blob/6dbf3a711d6d83912866ac6bb59eb8670969f302/CRC/crc.py",
+    "licence": "MIT",
+    "copyright": "Copyright (c) 2018 Craig Richards",
+    "lines": 55
+  },
+  {
+    "file": "real_geek_number_guessing.py",
+    "source_repo": "https://github.com/geekcomputers/Python",
+    "original_path": "number guessing.py",
+    "commit": "6dbf3a711d6d83912866ac6bb59eb8670969f302",
+    "source_url": "https://github.com/geekcomputers/Python/blob/6dbf3a711d6d83912866ac6bb59eb8670969f302/number%20guessing.py",
+    "licence": "MIT",
+    "copyright": "Copyright (c) 2018 Craig Richards",
+    "lines": 56
+  },
+  {
+    "file": "real_geek_counting_sort.py",
+    "source_repo": "https://github.com/geekcomputers/Python",
+    "original_path": "Sorting Algorithms/Counting-sort.py",
+    "commit": "6dbf3a711d6d83912866ac6bb59eb8670969f302",
+    "source_url": "https://github.com/geekcomputers/Python/blob/6dbf3a711d6d83912866ac6bb59eb8670969f302/Sorting%20Algorithms/Counting-sort.py",
+    "licence": "MIT",
+    "copyright": "Copyright (c) 2018 Craig Richards",
+    "lines": 43
+  },
+  {
+    "file": "real_geek_recursive_strings.py",
+    "source_repo": "https://github.com/geekcomputers/Python",
+    "original_path": "recursiveStrings.py",
+    "commit": "6dbf3a711d6d83912866ac6bb59eb8670969f302",
+    "source_url": "https://github.com/geekcomputers/Python/blob/6dbf3a711d6d83912866ac6bb59eb8670969f302/recursiveStrings.py",
+    "licence": "MIT",
+    "copyright": "Copyright (c) 2018 Craig Richards",
+    "lines": 39
+  },
+  {
+    "file": "real_geek_snake_wall.py",
+    "source_repo": "https://github.com/geekcomputers/Python",
+    "original_path": "Snake Game Using Turtle/wall.py",
+    "commit": "6dbf3a711d6d83912866ac6bb59eb8670969f302",
+    "source_url": "https://github.com/geekcomputers/Python/blob/6dbf3a711d6d83912866ac6bb59eb8670969f302/Snake%20Game%20Using%20Turtle/wall.py",
+    "licence": "MIT",
+    "copyright": "Copyright (c) 2018 Craig Richards",
+    "lines": 46
+  },
+  {
+    "file": "real_geek_search_bst.py",
+    "source_repo": "https://github.com/geekcomputers/Python",
+    "original_path": "binary_search_trees/search_in_bst.py",
+    "commit": "6dbf3a711d6d83912866ac6bb59eb8670969f302",
+    "source_url": "https://github.com/geekcomputers/Python/blob/6dbf3a711d6d83912866ac6bb59eb8670969f302/binary_search_trees/search_in_bst.py",
+    "licence": "MIT",
+    "copyright": "Copyright (c) 2018 Craig Richards",
+    "lines": 19
+  },
+  {
+    "file": "real_algo_reverse_words.py",
+    "source_repo": "https://github.com/TheAlgorithms/Python",
+    "original_path": "strings/reverse_words.py",
+    "commit": "30507bbe41397065728167fb09aa820f9fce8dc7",
+    "source_url": "https://github.com/TheAlgorithms/Python/blob/30507bbe41397065728167fb09aa820f9fce8dc7/strings/reverse_words.py",
+    "licence": "MIT",
+    "copyright": "Copyright (c) 2016-2022 TheAlgorithms and contributors",
+    "lines": 17
+  },
+  {
+    "file": "real_algo_nand_gate.py",
+    "source_repo": "https://github.com/TheAlgorithms/Python",
+    "original_path": "boolean_algebra/nand_gate.py",
+    "commit": "30507bbe41397065728167fb09aa820f9fce8dc7",
+    "source_url": "https://github.com/TheAlgorithms/Python/blob/30507bbe41397065728167fb09aa820f9fce8dc7/boolean_algebra/nand_gate.py",
+    "licence": "MIT",
+    "copyright": "Copyright (c) 2016-2022 TheAlgorithms and contributors",
+    "lines": 36
+  },
+  {
+    "file": "real_algo_exchange_sort.py",
+    "source_repo": "https://github.com/TheAlgorithms/Python",
+    "original_path": "sorts/exchange_sort.py",
+    "commit": "30507bbe41397065728167fb09aa820f9fce8dc7",
+    "source_url": "https://github.com/TheAlgorithms/Python/blob/30507bbe41397065728167fb09aa820f9fce8dc7/sorts/exchange_sort.py",
+    "licence": "MIT",
+    "copyright": "Copyright (c) 2016-2022 TheAlgorithms and contributors",
+    "lines": 42
+  },
+  {
+    "file": "real_algo_kaprekar.py",
+    "source_repo": "https://github.com/TheAlgorithms/Python",
+    "original_path": "maths/special_numbers/kaprekar_number.py",
+    "commit": "30507bbe41397065728167fb09aa820f9fce8dc7",
+    "source_url": "https://github.com/TheAlgorithms/Python/blob/30507bbe41397065728167fb09aa820f9fce8dc7/maths/special_numbers/kaprekar_number.py",
+    "licence": "MIT",
+    "copyright": "Copyright (c) 2016-2022 TheAlgorithms and contributors",
+    "lines": 56
+  },
+  {
+    "file": "real_algo_monte_carlo_dice.py",
+    "source_repo": "https://github.com/TheAlgorithms/Python",
+    "original_path": "maths/monte_carlo_dice.py",
+    "commit": "30507bbe41397065728167fb09aa820f9fce8dc7",
+    "source_url": "https://github.com/TheAlgorithms/Python/blob/30507bbe41397065728167fb09aa820f9fce8dc7/maths/monte_carlo_dice.py",
+    "licence": "MIT",
+    "copyright": "Copyright (c) 2016-2022 TheAlgorithms and contributors",
+    "lines": 44
+  },
+  {
+    "file": "real_algo_euler_002.py",
+    "source_repo": "https://github.com/TheAlgorithms/Python",
+    "original_path": "project_euler/problem_002/sol1.py",
+    "commit": "30507bbe41397065728167fb09aa820f9fce8dc7",
+    "source_url": "https://github.com/TheAlgorithms/Python/blob/30507bbe41397065728167fb09aa820f9fce8dc7/project_euler/problem_002/sol1.py",
+    "licence": "MIT",
+    "copyright": "Copyright (c) 2016-2022 TheAlgorithms and contributors",
+    "lines": 48
+  }
+]
