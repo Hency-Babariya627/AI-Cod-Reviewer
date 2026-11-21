@@ -23,12 +23,13 @@ _EXPLANATIONS = {
         "Check for a typo, or define the variable, function, or import before using it.",
     ),
     "F841": (
-        "A variable was given a value but is never used afterwards.",
-        "Remove the variable, or use its value. If you only need the function call, drop the 'name =' part.",
+        "A variable is given a value but never used afterwards.",
+        "Delete the line, or use the variable, for example return it or print it. If the right-hand side is a function call you still need, keep the call and drop the 'name =' part.",
     ),
     "F811": (
-        "A name is defined again before the first definition was used, so the first one is lost.",
-        "Rename one of them, or delete the one you do not need.",
+        "The same name is defined twice, for example two functions called 'greet', and the first one is never used before the second replaces it. Python only keeps the last one.",
+        "If you need both, give them different names and update every place that calls the one you renamed. If you only need one, delete the other.",
+    
     ),
     "F541": (
         "This f-string has no {placeholders}, so the 'f' in front does nothing.",
@@ -76,7 +77,7 @@ _EXPLANATIONS = {
     ),
     "E741": (
         "A variable is named 'l', 'O', or 'I', which look like the numbers 1 and 0.",
-        "Use a more descriptive name.",
+        "Rename it to something descriptive, for example 'length', 'line' or 'index' instead of 'l'.",
     ),
     "W291": (
         "There are extra spaces at the end of this line.",
@@ -103,8 +104,8 @@ _EXPLANATIONS = {
         "Write 'x is not y' instead.",
     ),
     "E721": (
-        "Two types are compared with '==', for example 'type(a) == type(b)'. This can give wrong answers for related types.",
-        "Use 'isinstance(value, SomeType)' to check a type.",
+        "The code checks a type with '==', for example 'type(value) == int'. This only matches the exact type and fails for types built on it.",
+        "Replace it with 'isinstance(value, int)', where 'int' is the type you are checking for.",
     ),
     "F632": (
         "'is' or 'is not' is used to compare with a text or number. 'is' asks whether both sides are the very same object, not whether the values are equal, so the result can be wrong.",
@@ -119,8 +120,8 @@ _EXPLANATIONS = {
         "Import only what you need, for example 'from math import sqrt', or use 'import math'.",
     ),
     "F405": (
-        "This name may come from a 'from module import *' line, so Ruff cannot check that it exists.",
-        "Import the name explicitly instead of using '*'.",
+        "This name was probably imported by 'from module import *', so Ruff cannot check that it exists. A star import hides where names come from.",
+        "List the names you use, for example 'from math import sqrt', instead of 'from math import *'.",
     ),
 }
 
