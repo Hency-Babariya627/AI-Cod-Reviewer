@@ -8,6 +8,7 @@ from findings import (
     to_csv,
     to_markdown_table,
 )
+from llm_explain import OllamaProvider, enhance_explanation
 from overview import escape_markdown
 from pipeline import review_code
 from styles import (
@@ -39,6 +40,8 @@ DEFAULTS = {
     "upload_error": None,      # message if the upload failed
     "uploader_key": 0,         # changing this resets the file uploader widget
     "review_result": None,     # full result of the last review (includes its code)
+    "use_llm": False,          # switch: reword explanations with a local model
+    "llm_cache": {},           # model wording already received, keyed by "rule:line"
 }
 for key, value in DEFAULTS.items():
     st.session_state.setdefault(key, value)
@@ -57,14 +60,40 @@ def clear_all():
     st.session_state.last_file_id = None
     st.session_state.upload_error = None
     st.session_state.review_result = None
-    st.session_state.uploader_key += 1  # forces a fresh, empty uploader
+    st.session_state.llm_cache = {}
+    st.session_state.uploader_key += 1  # forces a fresh, empty uploader    
 
 
 def show_code_line(code_lines, line):
     if line and 1 <= line <= len(code_lines):
         st.code(code_lines[line - 1], language="python")
 
-
+def render_model_wording(finding, code):
+    """Optional model-written wording for one finding. Off unless the switch is on."""
+    if not st.session_state.use_llm:
+        return
+    key = f"{finding.rule}:{finding.line}"
+    cache = st.session_state.llm_cache
+    wording = cache.get(key)
+    if wording is None:
+        if not st.button("Reword with the local model (about 10 s)", key=f"llm_{key}"):
+            return
+        with st.spinner("Asking the local model..."):
+            wording = enhance_explanation(finding, code, OllamaProvider())
+        if wording is None:
+            st.caption(
+                "The local model did not answer, so only the standard explanation is shown. "
+                "Is Ollama running?"
+            )
+            return
+        cache[key] = wording
+    st.markdown("**Model-written wording:**")
+    st.markdown(escape_markdown(wording))
+    st.caption(
+        "Written by a small AI model on your computer. It can be wrong. The explanation "
+        "above comes from fixed rules and is the one to trust."
+    )
+    
 def render_syntax(result, code_lines):
     if not result.syntax_findings:
         st.success("No syntax errors found. Python can read this code.")
@@ -125,6 +154,7 @@ def render_ruff(result, code_lines):
             st.caption(labels.get(first.severity, "Finding"))
             st.markdown(f"**What it means:** {first.explanation}")
             st.markdown(f"**How to fix it:** {first.suggestion}")
+            render_model_wording(first, result.code)
             st.markdown("**Where:**")
             for f in items[:MAX_OCCURRENCES_SHOWN]:
                 st.markdown(f"Line {f.line}: {f.message}")
@@ -349,7 +379,18 @@ def render_results(result, code):
 # ---------- Sidebar ----------
 with st.sidebar:
     st.markdown(SIDEBAR_HTML, unsafe_allow_html=True)
-
+    st.toggle(
+        "Reword explanations with a local AI model",
+        key="use_llm",
+        help="Optional. Needs Ollama running on this computer. Off by default.",
+    )
+    if st.session_state.use_llm:
+        st.caption(
+            "Only the rule, the tool's message, the standard explanation and the one "
+            "flagged line are sent, to Ollama on this computer. Nothing leaves your machine."
+        )
+        
+        
 # Both pages are tabs so every widget is drawn on every run and keeps its state.
 tab_review, tab_about = st.tabs(["Code Reviewer", "About the Project"])
 
@@ -444,8 +485,9 @@ with tab_review:
                 st.session_state.review_result = None
             else:
                 with st.spinner("Reviewing your code..."):
+                    st.session_state.llm_cache = {}
                     st.session_state.review_result = review_code(code)
-
+                    
     # ---------- Results ----------
     st.markdown(
         section_html("03", "Analysis results", "Your latest review appears here."),
@@ -485,11 +527,11 @@ and *what to try next*, in plain language.
 - A plain-language overview of what the code is made of: imports, functions, classes and what runs.
 - A findings table with severity and source filters and a CSV download.
 - A summary of the results, tied to the exact code that was reviewed.
-
+- Optional: reword a Code quality explanation with a small AI model running on your own
+  computer (off by default, needs Ollama).
+  
 **Planned, not yet implemented**
-
-- Evaluation on a set of labelled code examples.
-- Optional LLM-written explanations. The core app does not need them.
+- A closer comparison of the model-written wording with the standard explanations.
 
 **Limits to keep in mind**
 
