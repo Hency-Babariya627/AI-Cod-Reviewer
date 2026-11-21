@@ -61,7 +61,7 @@ _EXPLANATIONS = {
     ),
     "E711": (
         "Comparing to None with '==' or '!=' can behave unexpectedly.",
-        "Use 'is None' or 'is not None'.",
+        "Use 'is None' or 'is not None'. Example: 'if x == None:' becomes 'if x is None:'.",
     ),
     "E712": (
         "Comparing to True or False with '==' is unnecessary.",
@@ -73,7 +73,7 @@ _EXPLANATIONS = {
     ),
     "E731": (
         "A lambda was assigned to a name. A normal function is clearer.",
-        "Use 'def name(...):' instead.",
+        "Use 'def name(...):' instead. Example: 'double = lambda x: x * 2' becomes 'def double(x):' followed by an indented 'return x * 2'.",
     ),
     "E741": (
         "A variable is named 'l', 'O', or 'I', which look like the numbers 1 and 0.",
@@ -97,11 +97,11 @@ _EXPLANATIONS = {
     ),
     "E713": (
         "A membership test is written as 'not x in y'. It works, but it is easy to misread.",
-        "Write 'x not in y' instead.",
+        "Write 'x not in y' instead. Example: 'if not a in items:' becomes 'if a not in items:'.",
     ),
     "E714": (
         "An identity test is written as 'not x is y'. It works, but it is easy to misread.",
-        "Write 'x is not y' instead.",
+        "Write 'x is not y' instead. Example: 'if not a is b:' becomes 'if a is not b:'.",
     ),
     "E721": (
         "The code checks a type with '==', for example 'type(value) == int'. This only matches the exact type and fails for types built on it.",
@@ -109,7 +109,7 @@ _EXPLANATIONS = {
     ),
     "F632": (
         "'is' or 'is not' is used to compare with a text or number. 'is' asks whether both sides are the very same object, not whether the values are equal, so the result can be wrong.",
-        "Use '==' or '!=' to compare values. Keep 'is' for None.",
+        "Use '==' or '!=' to compare values. Keep 'is' for None. Example: 'if age is 18:' becomes 'if age == 18:'.",
     ),
     "W191": (
         "This line is indented with a tab instead of spaces.",
