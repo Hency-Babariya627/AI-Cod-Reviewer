@@ -15,9 +15,9 @@ An optional LLM layer for explanations is planned and is not required for anythi
 
 ![AI Code Reviewer showing a review with findings](docs/screenshot.png)
 
-## Current status (updated 12 November 2026)
+## Current status (updated 21 November 2026)
 
-Working and covered by automated tests (74 tests pass):
+Working and covered by automated tests (203 tests pass):
 
 - Paste code or upload a single `.py` file (200 KB limit, UTF-8 only)
 - Uploaded-file status: shows whether the editor still matches the original file
@@ -25,6 +25,8 @@ Working and covered by automated tests (74 tests pass):
 - Syntax validation with Python's built-in `compile()`, with beginner-friendly explanations
 - Code quality review with Ruff (rule groups E, F, W), with severity and explanations
 - Complexity analysis with Radon, flagged at a score of 6 or higher
+- Explanations: rule-based templates for 27 Ruff rules and 11 kinds of syntax error, with fix
+  examples for some. Other rules get a generic explanation with a pointer to the Ruff documentation.
 - **What this code does:** a plain-language overview built with Python's `ast` module
   (imports, functions, classes, what runs when the file is run)
 - Summary cards and tabs for the results
@@ -33,9 +35,7 @@ Working and covered by automated tests (74 tests pass):
 
 Not done yet:
 
-- Evaluation on a labelled set of code examples (precision, recall, false positives, runtime).
-  **No evaluation results exist yet**, so this README makes no accuracy or performance claims.
-- Optional LLM-written explanations
+- Optional LLM-written explanations (not started; the app works without it)
 
 ## Requirements
 
@@ -66,22 +66,51 @@ The app opens at http://localhost:8501.
 python -m pytest
 ```
 
+## Run the evaluation
+
+```powershell
+python evaluate.py
+```
+
+The evaluation uses 452 labelled files in `eval_data/`, in three sets: 30 short snippets,
+17 files copied from two MIT-licensed public repositories (source, commit and licence are in
+`eval_data/real/MANIFEST.json`) and 405 generated programs covering 25 rules, clean files,
+near-miss code, syntax errors and edge cases (`eval_data/generated/DATASET_CARD.md`).
+On the current version, all 362 expected findings were reported with no extra findings,
+all 18 expected complexity flags matched, all 28 syntax errors were detected and none of the
+109 clean files received a finding. The median time was about 90 ms per file on the
+development laptop (it varies between runs).
+
+How to read this: the scores show that the app reports what Ruff, Radon and Python report,
+at the right place. They do not measure how accurate Ruff is in general. Labels come from the edit made to each file, and Ruff was used only afterwards as a cross-check. Only rules that Ruff supports are covered, and complexity has few cases.
+
+Explanation quality: 10 explanations were rated from 1 to 3 on accuracy, clarity,
+actionability and unsupported claims by two raters (sheets and results in
+`docs/explanation_ratings/`). Wording for 5 rules was then rewritten and rated again;
+actionability rose, the other criteria did not change clearly. Five further rules got
+fix examples that were not rated.
+
+
 ## Project structure
 
 ```
-app.py                  Streamlit interface: layout, widgets, display of results
-styles.py               CSS and fixed HTML snippets (no user text is ever put into them)
-pipeline.py             Runs every analyzer once and bundles the results (ReviewResult)
-models.py               Shared Finding format
-findings.py             Combines all findings into one table / CSV (no UI code)
-overview.py             "What this code does" overview built with ast (no UI code)
-analyzers/
-    syntax_check.py     compile()-based syntax validation
-    ruff_check.py       Ruff integration (subprocess, code sent through stdin)
-    radon_check.py      Radon integration (Python API)
-tests/                  pytest tests for every module above
-docs/DESIGN.md          Architecture and design decisions
-.streamlit/config.toml  Theme and upload limit
+app.py                     Streamlit interface: layout, widgets, display of results
+styles.py                  CSS and fixed HTML snippets (no user text is ever put into them)
+pipeline.py                Runs every analyzer once and bundles the results (ReviewResult)
+models.py                  Shared Finding format
+findings.py                Combines all findings into one table / CSV (no UI code)
+overview.py                "What this code does" overview built with ast (no UI code)
+evaluate.py                Scores the app against the labelled files in eval_data/
+eval_data/                 Labelled evaluation sets (cases, real, generated) and results.json
+analyzers/   
+    syntax_check.py        compile()-based syntax validation
+    ruff_check.py          Ruff integration (subprocess, code sent through stdin)
+    radon_check.py         Radon integration (Python API)
+tests/                     pytest tests for every module above
+docs/   
+    DESIGN.md              Architecture and design decisions
+    explanation_ratings/   Rating sheets and scores for the explanation quality check
+.streamlit/config.toml     Theme and upload limit
 ```
 
 ## How it works
@@ -115,3 +144,6 @@ docs/DESIGN.md          Architecture and design decisions
 - The overview describes structure, not correctness. Its "uses" notes follow only
   functions defined in the same file, not class methods.
 - Explanations are rule-based templates, not written for each submission.
+- Syntax-error explanations cover 11 common kinds; rarer errors get a generic explanation.
+- Only 10 of the 27 rule explanations were rated, by two raters, so the quality check is small.
+- The evaluation data is short; it is not a sample of real student code.

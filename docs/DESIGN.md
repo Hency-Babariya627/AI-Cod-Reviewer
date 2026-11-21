@@ -1,6 +1,6 @@
 # Design Decisions
 
-Last updated 12 November 2026 (Sprint 2).
+Last updated 21 November 2026 (Sprint 3).
 
 ## Architecture
 
@@ -39,6 +39,9 @@ Ruff + Radon + `ast` overview -> `ReviewResult` -> displayed by `app.py`.
 | Repeated Ruff findings grouped by rule | Ten long-line warnings become one entry instead of ten. |
 | HTML in `styles.py` is fixed text; submitted text is escaped | Nothing from the submitted code is rendered as HTML, and Markdown characters in docstrings and defaults are escaped or shown inside code spans. |
 | Upload limit 200 KB in the app, 1 MB in Streamlit's config | The app gives a friendly error for files between the two. |
+| Explanations are rule-based templates in `ruff_check.py` and `syntax_check.py`, with a generic fallback | Works without an AI service and can be tested. A test fails if a rule in the evaluation set has no template. |
+| Explanation quality checked with a 1 to 3 rubric by two raters, then rewritten and rated again | Follows the proposal's rubric (accuracy, clarity, actionability, unsupported claims). Unchanged controls were included to show rater noise. |
+| Evaluation labels come from the edit made to each file, not from tool output | A label copied from the tool would make the score circular. Ruff was used only afterwards to catch design mistakes. |
 
 ## Measured finding: Ruff start-up time
 
@@ -52,9 +55,13 @@ evaluation is planned for Sprint 4.
 
 ## Test status
 
-74 automated tests pass (syntax, Ruff, Radon, pipeline, findings, overview).
-Browser behaviour was checked manually: upload and file status, syntax-error display,
-summary and tabs, findings table with filters and CSV download, and the overview tab.
+203 automated tests pass (syntax, Ruff, Radon, pipeline, findings, overview, explanation
+coverage, explanation alignment with the real findings, and syntax-error explanations).
+Browser behaviour was checked manually.
 
-No evaluation on labelled examples has been run yet. Detection precision, recall,
-false positives and explanation quality are planned for Sprint 4 and are not measured.
+The labelled evaluation (452 files, `python evaluate.py`) reported all 362 expected findings
+with no extra findings, matched all 18 expected complexity flags, detected all 28 syntax
+errors and gave no findings on 109 clean files. These scores show that the integration is
+correct; they do not show general accuracy, because the data is short and only
+covers rules Ruff supports. Explanation quality was rated for 10 rules by two raters;
+see `docs/explanation_ratings/`.
